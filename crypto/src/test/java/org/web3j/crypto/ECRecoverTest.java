@@ -12,13 +12,12 @@
  */
 package org.web3j.crypto;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
-
 import org.web3j.crypto.Sign.SignatureData;
 import org.web3j.utils.Numeric;
+
+import java.math.BigInteger;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,6 +55,7 @@ public class ECRecoverTest {
 
         // Iterate for each possible key to recover
         for (int i = 0; i < 4; i++) {
+
             BigInteger publicKey =
                     Sign.recoverFromSignature(
                             (byte) i,
@@ -76,4 +76,52 @@ public class ECRecoverTest {
         assertEquals(addressRecovered, (address));
         assertTrue(match);
     }
+
+
+    @Test
+    public void testRecoverAddressFromPersonalSign() {
+
+        String signature = "0xa90bb3ace79bf7c2013da8e0b2f0477d1976f25a8b46865a179350868d55ec1569a6c551048c25117662e169f52581cf0c0fb2194167cbd8c5cb40fa7438987b1b";
+
+//        String address = "0x31b26e43651e9371c88af3d36c14cfd938baf4fd";
+        String message = "Example `personal_sign` message";
+
+        String prefix = PERSONAL_MESSAGE_PREFIX + message.length();
+        byte[] msgHash = Hash.sha3((prefix + message).getBytes());
+
+        byte[] signatureBytes = Numeric.hexStringToByteArray(signature);
+        byte v = signatureBytes[64];
+        if (v < 27) {
+            v += 27;
+        }
+
+        SignatureData sd = new SignatureData(v, Arrays.copyOfRange(signatureBytes, 0, 32), Arrays.copyOfRange(signatureBytes, 32, 64));
+        String addressRecovered = null;
+        // Iterate for each possible key to recover
+        for (int i = 0; i < 4; i++) {
+            BigInteger publicKey = Sign.recoverFromSignature((byte) i, new ECDSASignature(new BigInteger(1, sd.getR()), new BigInteger(1, sd.getS())), msgHash);
+            if (publicKey != null) {
+                addressRecovered = "0x" + Keys.getAddress(publicKey);
+                System.out.println("address:" + addressRecovered);
+            }
+        }
+    }
+
+    public String recoverAddress(String signature, byte[] messages, long chainId, boolean needHash) {
+
+        byte[] msgHash = needHash ? Hash.sha3(messages) : messages;
+
+        byte[] signatureBytes = Numeric.hexStringToByteArray(signature);
+        byte v = signatureBytes[64];
+        if (v < 27) {
+            v += 27;
+        }
+
+        SignatureData sd = new SignatureData(v, Arrays.copyOfRange(signatureBytes, 0, 32), Arrays.copyOfRange(signatureBytes, 32, 64));
+        int recId = Sign.getRecId(sd, chainId);
+        BigInteger publicKey = Sign.recoverFromSignature((byte) recId, new ECDSASignature(new BigInteger(1, sd.getR()), new BigInteger(1, sd.getS())), msgHash);
+        String address = "0x" + Keys.getAddress(publicKey);
+        return address;
+    }
+
 }

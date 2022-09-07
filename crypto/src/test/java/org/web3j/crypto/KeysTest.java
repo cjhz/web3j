@@ -12,21 +12,17 @@
  */
 package org.web3j.crypto;
 
+import org.junit.jupiter.api.Test;
+import org.web3j.utils.Numeric;
+import org.web3j.utils.Strings;
+
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
 
-import org.junit.jupiter.api.Test;
-
-import org.web3j.utils.Numeric;
-import org.web3j.utils.Strings;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class KeysTest {
 
@@ -155,5 +151,16 @@ public class KeysTest {
     @Test
     public void testDeserializeInvalidKey() {
         assertThrows(RuntimeException.class, () -> Keys.deserialize(new byte[0]));
+    }
+
+    @Test
+    public void toChecksumAddress() {
+        String[] sourceAddresss = {"0x5aaeb6053f3e94c9b9a09f33669435e7ef1beaed", "0X52908400098527886E0F7030069857D2E4169EE7", "0x8617e340b3d01fa5f11f306f4090fd50e238070d","0xa69fb25d58887950a3948441bdabebcc686b0812"};
+        System.out.println("checksumAddress start->");
+        Arrays.stream(sourceAddresss).forEach(address -> {
+            String checksumAddress = Keys.toChecksumAddress(address);
+            System.out.println(checksumAddress);
+        });
+        System.out.println("checksumAddress end");
     }
 }

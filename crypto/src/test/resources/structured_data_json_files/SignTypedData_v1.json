@@ -1,0 +1,22 @@
+[
+  {
+    "type": "string",
+    "name": "Message",
+    "value": "Hi, Alice!"
+  },
+  {
+    "type": "string",
+    "name": "Code",
+    "value": "Hello"
+  },
+  {
+    "type": "uint32",
+    "name": "A number",
+    "value": "1337"
+  },
+  {
+    "type": "uint32",
+    "name": "Type",
+    "value": "111"
+  }
+]
