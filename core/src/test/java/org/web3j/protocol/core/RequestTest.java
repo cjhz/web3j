@@ -19,12 +19,20 @@ import org.junit.jupiter.api.Test;
 
 import org.web3j.protocol.RequestTester;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.request.ShhFilter;
 import org.web3j.protocol.core.methods.request.ShhPost;
 import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Numeric;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RequestTest extends RequestTester {
 
@@ -155,11 +163,18 @@ public class RequestTest extends RequestTester {
     }
 
     @Test
+    public void testEthBaseFee() throws Exception {
+        web3j.ethBaseFee().send();
+
+        verifyResult("{\"jsonrpc\":\"2.0\",\"method\":\"eth_baseFee\",\"params\":[],\"id\":1}");
+    }
+
+    @Test
     public void testEthFeeHistory() throws Exception {
         web3j.ethFeeHistory(1, DefaultBlockParameterName.LATEST, null).send();
 
         verifyResult(
-                "{\"jsonrpc\":\"2.0\",\"method\":\"eth_feeHistory\",\"params\":[1,\"latest\",null],\"id\":1}");
+                "{\"jsonrpc\":\"2.0\",\"method\":\"eth_feeHistory\",\"params\":[\"0x1\",\"latest\",null],\"id\":1}");
     }
 
     @Test
@@ -430,6 +445,17 @@ public class RequestTest extends RequestTester {
     }
 
     @Test
+    public void testEthGetBlockReceipts() throws Exception {
+        web3j.ethGetBlockReceipts(DefaultBlockParameter.valueOf(BigInteger.valueOf(15455945)))
+                .send();
+
+        verifyResult(
+                "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockReceipts\",\"params\":["
+                        + "\"0xebd6c9\"],"
+                        + "\"id\":1}");
+    }
+
+    @Test
     public void testEthGetUncleByBlockHashAndIndex() throws Exception {
         web3j.ethGetUncleByBlockHashAndIndex(
                         "0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b",
@@ -592,6 +618,22 @@ public class RequestTest extends RequestTester {
                         + "\"params\":[{\"topics\":[],"
                         + "\"blockHash\":\"0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331\","
                         + "\"address\":[\"\"]}],\"id\":<generatedValue>}");
+    }
+
+    @Test
+    public void testEthGetProof() throws Exception {
+        web3j.ethGetProof(
+                        "0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842",
+                        Arrays.asList(
+                                "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"),
+                        "latest")
+                .send();
+        verifyResult(
+                "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getProof\","
+                        + "\"params\":[\"0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842\","
+                        + "[\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\"],"
+                        + "\"latest\"],"
+                        + "\"id\":0}");
     }
 
     @Test
@@ -776,5 +818,29 @@ public class RequestTest extends RequestTester {
         web3j.txPoolStatus().send();
 
         verifyResult("{\"jsonrpc\":\"2.0\",\"method\":\"txpool_status\",\"params\":[],\"id\":1}");
+    }
+
+    @Test
+    public void testEthGetBaseFeePerBlobGas() throws Exception {
+        // mock Web3jService
+        Web3jService web3jService = mock(Web3jService.class);
+        EthBlock ethBlock = mock(EthBlock.class);
+        EthBlock.Block block = mock(EthBlock.Block.class);
+
+        when(web3jService.send(any(), eq(EthBlock.class))).thenReturn(ethBlock);
+        when(ethBlock.getBlock()).thenReturn(block);
+        when(block.getExcessBlobGas()).thenReturn(BigInteger.ZERO);
+
+        JsonRpc2_0Web3j jsonRpc20Web3j = new JsonRpc2_0Web3j(web3jService);
+
+        BigInteger resultWhenExcessBlobGasIsZero = jsonRpc20Web3j.ethGetBaseFeePerBlobGas();
+        assertEquals(
+                BigInteger.ONE,
+                resultWhenExcessBlobGasIsZero); // Expected result based on your fakeExponential
+        // logic and input
+
+        when(block.getExcessBlobGas()).thenReturn(BigInteger.valueOf(79429632L));
+        BigInteger resultWhenExcessBlobGasIsNotZero = jsonRpc20Web3j.ethGetBaseFeePerBlobGas();
+        assertEquals(BigInteger.valueOf(21518435987L), resultWhenExcessBlobGasIsNotZero);
     }
 }

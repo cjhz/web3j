@@ -1,9 +1,9 @@
 Web3j: Web3 Java Ethereum Ðapp API
 ==================================
 
-[![Documentation Status](https://img.shields.io/travis/web3j/web3j-docs?label=docs)](https://docs.web3j.io/)
-[![Build Status](https://travis-ci.org/web3j/web3j.svg?branch=master)](https://travis-ci.org/web3j/web3j)
-[![codecov](https://codecov.io/gh/web3j/web3j/branch/master/graph/badge.svg)](https://codecov.io/gh/web3j/web3j)
+[![Documentation Status](https://readthedocs.org/projects/web3j-docs/badge/?version=latest)](https://docs.web3j.io)
+[![build status](https://github.com/web3j/web3j/actions/workflows/build.yml/badge.svg)](https://github.com/web3j/web3j/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/web3j/web3j/branch/main/graph/badge.svg?token=a4G9ITI6CU)](https://codecov.io/gh/web3j/web3j)
 [![Discord](https://img.shields.io/discord/779382027614158919?label=discord)](https://discord.gg/A9UXfPF2tS)
 
 
@@ -20,6 +20,14 @@ integration code for the platform.
 
 The [Java and the Blockchain](https://www.youtube.com/watch?v=ea3miXs_P6Y) talk provides
 an overview of blockchain, Ethereum and Web3j.
+
+NEW! Get involved!
+--------
+Since Web3J moved under Hyperledger we started to do Web3J Contributors calls every 2 weeks!
+Subscribe to our community page and to see check our call schedule.
+Your contribution matters!
+- [Community Link](https://lists.hyperledger.org/g/web3j) - Check our last updates! 
+- [Calendar Invite](https://lists.hyperledger.org/g/web3j/ics/invite.ics?repeatid=57401) - Add the contributor call to your calendar!
 
 Features
 --------
@@ -62,8 +70,7 @@ It has five runtime dependencies:
     for HTTP connections
 -   [Jackson Core](https://github.com/FasterXML/jackson-core) for fast
     JSON serialisation/deserialization
--   [Bouncy Castle](https://www.bouncycastle.org/) ([Spongy
-    Castle](https://rtyley.github.io/spongycastle/) on Android) for
+-   [Bouncy Castle](https://www.bouncycastle.org/) for
     crypto
 -   [Jnr-unixsocket](https://github.com/jnr/jnr-unixsocket) for \*nix
     IPC (not available on Android)
@@ -111,7 +118,7 @@ Java:
 <dependency>
   <groupId>org.web3j</groupId>
   <artifactId>core</artifactId>
-  <version>4.8.7</version>
+  <version>4.12.0</version>
 </dependency>
 ```
 
@@ -121,7 +128,7 @@ Android:
 <dependency>
   <groupId>org.web3j</groupId>
   <artifactId>core</artifactId>
-  <version>4.8.7-android</version>
+  <version>4.8.9-android</version>
 </dependency>
 ```
 
@@ -131,13 +138,13 @@ Gradle
 Java:
 
 ```groovy
-implementation ('org.web3j:core:4.8.7')
+implementation ('org.web3j:core:4.12.0')
 ```
 
 Android:
 
 ```groovy
-implementation ('org.web3j:core:4.8.7-android')
+implementation ('org.web3j:core:4.8.9-android')
 ```
 
 Build instructions

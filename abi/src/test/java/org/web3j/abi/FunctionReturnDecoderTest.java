@@ -282,6 +282,24 @@ public class FunctionReturnDecoderTest {
     }
 
     @Test
+    public void testDecodeDynamicStruct3() {
+        AbiV2TestFixture.Nazz nazz =
+                new AbiV2TestFixture.Nazz(
+                        Collections.singletonList(
+                                new AbiV2TestFixture.Nazzy(
+                                        Arrays.asList(
+                                                new AbiV2TestFixture.Foo("a", "b"),
+                                                new AbiV2TestFixture.Foo("c", "d")))),
+                        new BigInteger("100"));
+        String rawInput = FunctionEncoder.encodeConstructor(Collections.singletonList(nazz));
+
+        List<Type> decoded =
+                FunctionReturnDecoder.decode(
+                        rawInput, AbiV2TestFixture.getNazzFunction.getOutputParameters());
+        assertEquals(Collections.singletonList(nazz).get(0).toString(), decoded.get(0).toString());
+    }
+
+    @Test
     public void testDecodeDynamicStruct2() {
         String rawInput =
                 "0x0000000000000000000000000000000000000000000000000000000000000020"
@@ -1279,5 +1297,23 @@ public class FunctionReturnDecoderTest {
                                 new Uint256(0),
                                 new Uint256(0),
                                 new Uint256(0))));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testDecodeDynamicStructWithStaticStruct() {
+        String rawInput =
+                "0x0000000000000000000000000000000000000000000000000000000000000020"
+                        + "0000000000000000000000000000000000000000000000000000000000000001"
+                        + "000000000000000000000000000000000000000000000000000000000000000a"
+                        + "0000000000000000000000000000000000000000000000000000000000000060"
+                        + "0000000000000000000000000000000000000000000000000000000000000004"
+                        + "6461746100000000000000000000000000000000000000000000000000000000";
+        assertEquals(
+                FunctionReturnDecoder.decode(
+                        rawInput, AbiV2TestFixture.getQuxFunction.getOutputParameters()),
+                Arrays.asList(
+                        new AbiV2TestFixture.Qux(
+                                new AbiV2TestFixture.Bar(BigInteger.ONE, BigInteger.TEN), "data")));
     }
 }
